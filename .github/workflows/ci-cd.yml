@@ -22,12 +22,22 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Verify Azure CLI and subscription
+        run: |
+          az --version
+          az account show
+          az group exists --name $AZURE_RESOURCE_GROUP
+
       - name: Deploy Bicep template
         run: |
           az deployment group create \
             --resource-group $AZURE_RESOURCE_GROUP \
             --template-file Infra/main.bicep \
-            --parameters appName=$APP_NAME location=$AZURE_LOCATION sqlAdminPassword='${{ secrets.SQL_ADMIN_PASSWORD }}'
+            --parameters appName=$APP_NAME \
+            --parameters location=$AZURE_LOCATION \
+            --parameters sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }} \
+            --mode Incremental \
+            --verbose
 
   build-and-deploy-backend:
     needs: deploy-infra
