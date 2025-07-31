@@ -22,20 +22,20 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Verify Azure CLI and subscription
+      - name: Debug environment variables
         run: |
-          az --version
-          az account show
-          az group exists --name $AZURE_RESOURCE_GROUP
+          echo "AZURE_RESOURCE_GROUP=$AZURE_RESOURCE_GROUP"
+          echo "AZURE_LOCATION=$AZURE_LOCATION"
+          echo "APP_NAME=$APP_NAME"
 
       - name: Deploy Bicep template
         run: |
           az deployment group create \
-            --resource-group $AZURE_RESOURCE_GROUP \
-            --template-file Infra/main.bicep \
-            --parameters appName=$APP_NAME \
-            --parameters location=$AZURE_LOCATION \
-            --parameters sqlAdminPassword=${{ secrets.SQL_ADMIN_PASSWORD }} \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --template-file "Infra/main.bicep" \
+            --parameters appName="$APP_NAME" \
+            --parameters location="$AZURE_LOCATION" \
+            --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" \
             --mode Incremental \
             --verbose
 
