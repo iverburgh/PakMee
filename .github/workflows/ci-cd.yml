@@ -26,7 +26,7 @@ jobs:
         run: |
           az deployment group create \
             --resource-group $AZURE_RESOURCE_GROUP \
-            --template-file infra/main.bicep \
+            --template-file Infra/main.bicep \
             --parameters appName=$APP_NAME location=$AZURE_LOCATION
 
   build-and-deploy-backend:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: server
+        working-directory: Back-End
 
     steps:
       - uses: actions/checkout@v4
@@ -50,14 +50,14 @@ jobs:
         with:
           app-name: pakmee-api
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: server/publish
+          package: ./publish
 
   build-and-deploy-frontend:
     needs: deploy-infra
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: client
+        working-directory: Front-End
 
     steps:
       - uses: actions/checkout@v4
@@ -74,5 +74,5 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-          app_location: "client"
+          app_location: "."
           output_location: "dist"
