@@ -25,10 +25,9 @@ resource sqlDb 'Microsoft.Sql/servers/databases@2023-08-01' = {
     collation: 'SQL_Latin1_General_CP1_CI_AS'
   }
   sku: {
-    name: 'GP_S_Gen5_1'
-    tier: 'GeneralPurpose'
-    capacity: 1
-    family: 'Gen5'
+    name: 'Basic'
+    tier: 'Basic'
+    capacity: 5
   }
 }
 
