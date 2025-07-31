@@ -1,31 +1,34 @@
 param location string = resourceGroup().location
-param environment string = 'prod'
 param appName string = 'pakmee'
+@secure()
+param sqlAdminPassword string
 
 var backendAppName = '${appName}-api'
 var frontendAppName = '${appName}-web'
 var sqlServerName = '${appName}sql${uniqueString(resourceGroup().id)}'
 var sqlDbName = 'pakmee-db'
 
-resource sqlServer 'Microsoft.Sql/servers@2022-11-01' = {
+resource sqlServer 'Microsoft.Sql/servers@2023-08-01' = {
   name: sqlServerName
   location: location
   properties: {
     administratorLogin: 'sqladminuser'
-    administratorLoginPassword: 'VerySecurePassword123!' // Gebruik secret!
+    administratorLoginPassword: sqlAdminPassword
+  }
+}
+
+resource sqlDb 'Microsoft.Sql/servers/databases@2023-08-01' = {
+  parent: sqlServer
+  name: sqlDbName
+  location: location
+  properties: {
+    collation: 'SQL_Latin1_General_CP1_CI_AS'
   }
   sku: {
     name: 'GP_S_Gen5_1'
     tier: 'GeneralPurpose'
     capacity: 1
     family: 'Gen5'
-  }
-}
-
-resource sqlDb 'Microsoft.Sql/servers/databases@2022-11-01' = {
-  name: '${sqlServer.name}/${sqlDbName}'
-  properties: {
-    collation: 'SQL_Latin1_General_CP1_CI_AS'
   }
 }
 
@@ -64,10 +67,10 @@ resource staticWebApp 'Microsoft.Web/staticSites@2023-01-01' = {
     tier: 'Free'
   }
   properties: {
-    repositoryUrl: 'https://github.com/YOUR_GITHUB/pakmee'
+    repositoryUrl: 'https://github.com/iverburgh/PakMee'
     branch: 'main'
     buildProperties: {
-      appLocation: 'client'
+      appLocation: 'Front-End'
       outputLocation: 'dist'
       apiLocation: ''
     }

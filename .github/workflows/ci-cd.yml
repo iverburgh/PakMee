@@ -27,7 +27,7 @@ jobs:
           az deployment group create \
             --resource-group $AZURE_RESOURCE_GROUP \
             --template-file Infra/main.bicep \
-            --parameters appName=$APP_NAME location=$AZURE_LOCATION
+            --parameters appName=$APP_NAME location=$AZURE_LOCATION sqlAdminPassword='${{ secrets.SQL_ADMIN_PASSWORD }}'
 
   build-and-deploy-backend:
     needs: deploy-infra
